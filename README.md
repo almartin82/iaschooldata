@@ -1,0 +1,247 @@
+# iaschooldata
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/almartin82/iaschooldata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/almartin82/iaschooldata/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/almartin82/iaschooldata/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/almartin82/iaschooldata/actions/workflows/pkgdown.yaml)
+<!-- badges: end -->
+
+**[Documentation](https://almartin82.github.io/iaschooldata/)** | **[Getting Started](https://almartin82.github.io/iaschooldata/articles/quickstart.html)**
+
+Fetch and analyze Iowa public school enrollment data from the Iowa Department of Education.
+
+## What can you find with iaschooldata?
+
+**34 years of enrollment data (1992-2025).** 515,000 students today. Over 320 districts. Here are ten stories hiding in the numbers:
+
+---
+
+### 1. Iowa's enrollment is remarkably stable
+
+While neighboring states lose students, Iowa has held steady at around 500,000 students for three decades. No boom, no bust.
+
+```r
+library(iaschooldata)
+library(dplyr)
+
+enr <- fetch_enr_multi(c(1995, 2000, 2005, 2010, 2015, 2020, 2025))
+
+enr %>%
+  filter(is_state, grade_level == "TOTAL", subgroup == "total_enrollment") %>%
+  select(end_year, n_students)
+```
+
+![30-year enrollment](man/figures/enrollment-30yr.png)
+
+---
+
+### 2. Des Moines is the only large district
+
+Des Moines Public Schools serves 33,000 students, nearly 10x larger than the next biggest district. Iowa education is fundamentally rural.
+
+```r
+enr_2025 <- fetch_enr(2025)
+
+enr_2025 %>%
+  filter(is_district, grade_level == "TOTAL", subgroup == "total_enrollment") %>%
+  arrange(desc(n_students)) %>%
+  select(district_name, n_students) %>%
+  head(10)
+```
+
+---
+
+### 3. The Hispanic transformation of Iowa
+
+Hispanic students went from 2% to 13% of enrollment since 1992. Meatpacking towns like Storm Lake, Denison, and Marshalltown are now majority Hispanic.
+
+```r
+enr %>%
+  filter(is_state, grade_level == "TOTAL", subgroup == "hispanic") %>%
+  select(end_year, n_students, pct)
+```
+
+![Hispanic growth](man/figures/hispanic-growth.png)
+
+Storm Lake Community School District is now over 70% Hispanic.
+
+---
+
+### 4. COVID barely dented Iowa enrollment
+
+Iowa lost only 8,000 students during COVID, one of the smallest drops in the nation. The state's rural character may have helped.
+
+```r
+enr <- fetch_enr_multi(2019:2025)
+
+enr %>%
+  filter(is_state, grade_level == "TOTAL", subgroup == "total_enrollment") %>%
+  select(end_year, n_students) %>%
+  mutate(change = n_students - lag(n_students))
+```
+
+---
+
+### 5. Rural consolidation never stops
+
+Iowa had over 400 districts in 1992. Today it has around 320. Every year, more rural districts merge as enrollment shrinks.
+
+```r
+purrr::map_df(c(1995, 2005, 2015, 2025), fetch_enr) %>%
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
+  group_by(end_year) %>%
+  summarize(n_districts = n())
+```
+
+---
+
+### 6. 56 districts have fewer than 300 students
+
+Iowa's smallest districts serve just a few hundred students. Ringgold County has fewer than 200. The economics of small-town education are brutal.
+
+```r
+enr_2025 %>%
+  filter(is_district, grade_level == "TOTAL", subgroup == "total_enrollment") %>%
+  filter(n_students < 300) %>%
+  arrange(n_students) %>%
+  select(district_name, n_students) %>%
+  head(10)
+```
+
+---
+
+### 7. Kindergarten is holding steady
+
+Unlike many states where kindergarten enrollment is plummeting, Iowa's kindergarten numbers remain stable. Birth rates have not collapsed.
+
+```r
+enr %>%
+  filter(is_state, subgroup == "total_enrollment", grade_level == "K") %>%
+  select(end_year, n_students)
+```
+
+![Kindergarten trend](man/figures/kindergarten.png)
+
+---
+
+### 8. English Learners have tripled
+
+Iowa's ELL population grew from 10,000 to 35,000 students since 2000. Schools in rural communities now need ESL teachers.
+
+```r
+fetch_enr_multi(2000:2025) %>%
+  filter(is_state, grade_level == "TOTAL", subgroup == "lep") %>%
+  select(end_year, n_students, pct)
+```
+
+---
+
+### 9. The urban-rural divide grows
+
+Waukee, Ankeny, and West Des Moines suburbs are growing. Rural districts lose a dozen students each year. Two Iowas are emerging.
+
+```r
+suburbs <- c("Waukee Community School District", "Ankeny Community School District",
+             "West Des Moines Community School District")
+
+enr %>%
+  filter(district_name %in% suburbs, is_district,
+         grade_level == "TOTAL", subgroup == "total_enrollment") %>%
+  select(end_year, district_name, n_students) %>%
+  tidyr::pivot_wider(names_from = district_name, values_from = n_students)
+```
+
+![Urban vs rural](man/figures/urban-rural.png)
+
+---
+
+### 10. Iowa remains 80% white
+
+Despite demographic shifts, Iowa public schools are still predominantly white. Black students are concentrated in Des Moines, Davenport, and Waterloo.
+
+```r
+enr_2025 %>%
+  filter(is_state, grade_level == "TOTAL",
+         subgroup %in% c("white", "black", "hispanic", "asian")) %>%
+  select(subgroup, n_students, pct) %>%
+  arrange(desc(pct))
+```
+
+---
+
+## Installation
+
+```r
+# install.packages("remotes")
+remotes::install_github("almartin82/iaschooldata")
+```
+
+## Quick start
+
+```r
+library(iaschooldata)
+library(dplyr)
+
+# Fetch one year
+enr_2025 <- fetch_enr(2025)
+
+# Fetch multiple years
+enr_recent <- fetch_enr_multi(2020:2025)
+
+# Fetch ALL 34 years of data (1992-2025)
+enr_all <- fetch_enr_multi(1992:2025)
+
+# State totals
+enr_2025 %>%
+  filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL")
+
+# District breakdown
+enr_2025 %>%
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
+  arrange(desc(n_students))
+
+# Demographics by district
+enr_2025 %>%
+  filter(is_district, grade_level == "TOTAL",
+         subgroup %in% c("white", "black", "hispanic", "asian")) %>%
+  group_by(district_name, subgroup) %>%
+  summarize(n = sum(n_students, na.rm = TRUE))
+```
+
+## Data availability
+
+| Years | Source | Aggregation Levels | Demographics | Notes |
+|-------|--------|-------------------|--------------|-------|
+| **1992-2025** | Iowa DOE Education Statistics | State, District, School | Race, Gender | 34 years of consistent data |
+
+### What's available
+
+- **Levels:** State, district (~320), and school (~1,200)
+- **Demographics:** White, Black, Hispanic, Asian, Native American, Pacific Islander, Multiracial
+- **Grade levels:** Pre-K through Grade 12
+- **Special populations:** English Learners, Free/Reduced Lunch
+
+### ID System
+
+Iowa uses an AEA (Area Education Agency) structure:
+- **District ID:** 4-digit code (e.g., 1350 for Des Moines)
+- **School ID:** Building numbers within districts
+
+## Data source
+
+Iowa Department of Education: [Education Statistics](https://educate.iowa.gov/pk-12/data/education-statistics)
+
+## Part of the 50 State Schooldata Family
+
+This package is part of a family of R packages providing school enrollment data for all 50 US states. Each package fetches data directly from the state's Department of Education.
+
+**See also:** [njschooldata](https://github.com/almartin82/njschooldata) - The original state schooldata package for New Jersey.
+
+**All packages:** [github.com/almartin82](https://github.com/almartin82?tab=repositories&q=schooldata)
+
+## Author
+
+[Andy Martin](https://github.com/almartin82) (almartin@gmail.com)
+
+## License
+
+MIT
