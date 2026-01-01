@@ -1,14 +1,12 @@
 Package: iaschooldata
-Title: Fetch and Process Iowa School Data
+Title: Iowa School Data
 Version: 0.1.0
 Authors@R:
     person("Andrew", "Martin", , "almartin@gmail.com", role = c("aut", "cre"))
 Author: Andrew Martin [aut, cre]
 Maintainer: Andrew Martin <almartin@gmail.com>
-Description: Downloads and processes school data from the Iowa Department of
-    Education. Provides functions for fetching enrollment data and
-    transforming it into tidy format for analysis. Supports historical data
-    from 1992 to present across district and school levels.
+Description: A simple, consistent interface for accessing Iowa
+    school data in R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
