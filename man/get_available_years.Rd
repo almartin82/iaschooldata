@@ -4,15 +4,31 @@
 \alias{get_available_years}
 \title{Get available years for Iowa enrollment data}
 \usage{
-get_available_years()
+get_available_years(include_missing = FALSE)
+}
+\arguments{
+\item{include_missing}{If FALSE (default), returns only years with data.
+If TRUE, returns full range from min to max year.}
 }
 \value{
 Integer vector of available years
 }
 \description{
-Returns the range of years for which enrollment data is available.
-Iowa has data from 1991-92 (end_year = 1992) through 2024-25 (end_year = 2025).
+Returns the years for which enrollment data is available.
+Iowa has historical data from 1946-47 and modern data through 2024-25.
+}
+\details{
+Note: Not all years have data available. Missing years include:
+\itemize{
+\item 1948 (1947-48)
+\item 1950 (1949-50)
+\item 1952 (1951-52)
+\item 1954 (1953-54)
+\item 1971 (1970-71)
+\item 1972 (1971-72)
+}
 }
 \examples{
 get_available_years()
+get_available_years(include_missing = TRUE)
 }

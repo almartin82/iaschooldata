@@ -10,8 +10,12 @@
 #
 # Iowa provides Excel files with enrollment by grade, race, ethnicity, and gender.
 # Data availability:
-# - District level: 1991-92 through 2024-25
-# - School (building) level: 1991-92 through 2024-25
+# - Modern data (1992-2025): District and school level with demographics
+# - Historical data (1947-1991): District level only, grade enrollment only
+#   - 1946-47, 1948-49 (media 10321)
+#   - 1950-51 to 1969-70 (media 10322)
+#   - 1972-73 to 1985-86 (media 5590)
+#   - 1986-87 to 1991-92 (media 5591)
 #
 # URL pattern: https://educate.iowa.gov/media/{media_id}/download?inline
 #
@@ -22,6 +26,71 @@
 #' @keywords internal
 iowa_base_url <- function() {
   "https://educate.iowa.gov/media/"
+}
+
+
+#' Check if year is in historical range
+#'
+#' Historical data (1947-1991) has a different format than modern data.
+#'
+#' @param end_year School year end
+#' @return TRUE if year is in historical range
+#' @keywords internal
+is_historical_year <- function(end_year) {
+  end_year >= 1947 && end_year <= 1991
+}
+
+
+#' Get historical file info for a given year
+#'
+#' Returns the media ID and year format for historical enrollment files.
+#' Historical files contain multiple years of data.
+#'
+#' @param end_year School year end (e.g., 1970 for 1969-70)
+#' @return List with media_id and school_year_format
+#' @keywords internal
+get_historical_file_info <- function(end_year) {
+  # Map end years to their source files
+  # Media ID 10321: 1946-47, 1948-49 (years 1947, 1949)
+  # Media ID 10322: 1950-51 to 1969-70 (years 1951, 1953, 1955-1970)
+  # Media ID 5590: 1972-73 to 1985-86 (years 1973-1986)
+  # Media ID 5591: 1986-87 to 1991-92 (years 1987-1992)
+
+  if (end_year %in% c(1947, 1949)) {
+    list(
+      media_id = "10321",
+      skip_rows = 6,
+      year_col = "School Year",
+      district_id_col = NULL,  # No district IDs in this file
+      has_special_ed = FALSE
+    )
+  } else if (end_year >= 1951 && end_year <= 1970) {
+    list(
+      media_id = "10322",
+      skip_rows = 5,
+      year_col = "School Year",
+      district_id_col = "District Number",
+      has_special_ed = FALSE
+    )
+  } else if (end_year >= 1973 && end_year <= 1986) {
+    list(
+      media_id = "5590",
+      skip_rows = 6,
+      year_col = "Year",
+      district_id_col = "District Code",
+      has_special_ed = TRUE
+    )
+  } else if (end_year >= 1987 && end_year <= 1991) {
+    list(
+      media_id = "5591",
+      skip_rows = 7,
+      year_col = "Year",
+      district_id_col = "District Code",
+      has_special_ed = TRUE
+    )
+  } else {
+    stop(paste("Year", end_year, "is not in historical range (1947-1991) or data is not available"))
+  }
 }
 
 
@@ -156,18 +225,31 @@ get_raw_enr <- function(end_year) {
 
   message(paste("Downloading Iowa enrollment data for", end_year, "..."))
 
-  # Download district-level data
-  message("  Downloading district data...")
-  district_data <- download_iowa_excel(end_year, "district")
+  # Check if this is a historical year
+  if (is_historical_year(end_year)) {
+    # Historical data is district-level only
+    message("  Downloading historical district data...")
+    district_data <- download_historical_excel(end_year)
 
-  # Download school-level data
-  message("  Downloading school data...")
-  school_data <- download_iowa_excel(end_year, "school")
+    list(
+      district = district_data,
+      school = data.frame(),  # No school-level data for historical years
+      is_historical = TRUE
+    )
+  } else {
+    # Modern data - download both district and school
+    message("  Downloading district data...")
+    district_data <- download_iowa_excel(end_year, "district")
 
-  list(
-    district = district_data,
-    school = school_data
-  )
+    message("  Downloading school data...")
+    school_data <- download_iowa_excel(end_year, "school")
+
+    list(
+      district = district_data,
+      school = school_data,
+      is_historical = FALSE
+    )
+  }
 }
 
 
@@ -248,6 +330,86 @@ download_iowa_excel <- function(end_year, level) {
 
   }, error = function(e) {
     warning(paste("Failed to download", level, "data for", end_year, "-", e$message))
+    return(data.frame())
+  })
+}
+
+
+#' Download and read historical Iowa DOE Excel file
+#'
+#' Downloads a historical Excel file from Iowa DOE and extracts data for the
+#' specified year. Historical files contain multiple years of data.
+#'
+#' @param end_year School year end (1947-1991)
+#' @return Data frame with enrollment data for the specified year
+#' @keywords internal
+download_historical_excel <- function(end_year) {
+
+  file_info <- get_historical_file_info(end_year)
+  url <- build_download_url(file_info$media_id)
+
+  temp_file <- tempfile(fileext = ".xlsx")
+
+  tryCatch({
+    response <- httr::GET(
+      url,
+      httr::write_disk(temp_file, overwrite = TRUE),
+      httr::timeout(300)
+    )
+
+    if (httr::http_error(response)) {
+      warning(paste("Failed to download historical data for", end_year,
+                    "- HTTP error:", httr::status_code(response)))
+      return(data.frame())
+    }
+
+    # Check file size
+    file_info_fs <- file.info(temp_file)
+    if (file_info_fs$size < 1000) {
+      warning(paste("Downloaded file appears too small for historical data"))
+      return(data.frame())
+    }
+
+    # Read Excel file with proper skip rows
+    df <- readxl::read_excel(
+      temp_file,
+      skip = file_info$skip_rows,
+      col_types = "text"
+    )
+
+    # Build the school year string to filter on
+    # Format varies: "1946-47", "1950-1951", "1972-1973"
+    year_str_short <- paste0(end_year - 1, "-", substr(as.character(end_year), 3, 4))
+    year_str_long <- paste0(end_year - 1, "-", end_year)
+
+    # Filter to just the requested year
+    year_col <- file_info$year_col
+    df <- df[df[[year_col]] %in% c(year_str_short, year_str_long), ]
+
+    if (nrow(df) == 0) {
+      warning(paste("No data found for year", end_year,
+                    "- looking for", year_str_short, "or", year_str_long))
+      return(data.frame())
+    }
+
+    # Standardize column names (uppercase, no spaces)
+    names(df) <- toupper(gsub("[^A-Za-z0-9_]", "_", names(df)))
+    names(df) <- gsub("_+", "_", names(df))
+    names(df) <- gsub("_$", "", names(df))
+    names(df) <- gsub("^_", "", names(df))
+
+    # Remove any rows that are all NA or empty
+    df <- df[rowSums(!is.na(df) & df != "") > 0, ]
+
+    # Add metadata
+    df$end_year <- end_year
+    df$level <- "district"
+    df$is_historical <- TRUE
+
+    df
+
+  }, error = function(e) {
+    warning(paste("Failed to download historical data for", end_year, "-", e$message))
     return(data.frame())
   })
 }

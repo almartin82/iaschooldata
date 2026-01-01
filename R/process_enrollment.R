@@ -10,10 +10,14 @@
 # - School ID: Building identifier within district
 # - Data is reported as of October 1st (certified enrollment date)
 #
-# Column naming conventions in Iowa files:
+# Modern data (1992+) column naming conventions:
 # - Grade levels: PK, K, 1 through 12
 # - Demographics: WHITE, BLACK/AFRICAN AMERICAN, HISPANIC, ASIAN, etc.
 # - Gender: MALE, FEMALE
+#
+# Historical data (1947-1991) has limited columns:
+# - District Name, District Code (some files), Year, KG/Kindergarten, Grades 1-12, Total
+# - No demographic or gender breakdowns
 #
 # ==============================================================================
 
@@ -29,11 +33,18 @@
 #' @keywords internal
 process_enr <- function(raw_data, end_year) {
 
-  # Process district data
-  district_processed <- process_district_enr(raw_data$district, end_year)
+  # Check if this is historical data
+  is_historical <- isTRUE(raw_data$is_historical)
 
-  # Process school data
-  school_processed <- process_school_enr(raw_data$school, end_year)
+  if (is_historical) {
+    # Process historical district data (no school data available)
+    district_processed <- process_historical_enr(raw_data$district, end_year)
+    school_processed <- data.frame()
+  } else {
+    # Process modern district and school data
+    district_processed <- process_district_enr(raw_data$district, end_year)
+    school_processed <- process_school_enr(raw_data$school, end_year)
+  }
 
   # Create state aggregate
   state_processed <- create_state_aggregate(district_processed, end_year)
@@ -162,6 +173,136 @@ process_district_enr <- function(df, end_year) {
 
   for (name in names(grade_map)) {
     col <- find_col(grade_map[[name]])
+    if (!is.null(col)) {
+      result[[name]] <- safe_numeric(df[[col]])
+    } else {
+      result[[name]] <- NA_integer_
+    }
+  }
+
+  # Calculate row_total from grades if not found
+  if (all(is.na(result$row_total))) {
+    grade_cols <- grep("^grade_", names(result), value = TRUE)
+    if (length(grade_cols) > 0) {
+      result$row_total <- rowSums(result[, grade_cols, drop = FALSE], na.rm = TRUE)
+      result$row_total[result$row_total == 0] <- NA_integer_
+    }
+  }
+
+  result
+}
+
+
+#' Process historical enrollment data
+#'
+#' Processes historical (1947-1991) enrollment data which has a simpler format
+#' than modern data - grade-level enrollment only, no demographics or gender.
+#'
+#' @param df Raw historical data frame
+#' @param end_year School year end
+#' @return Processed historical data frame
+#' @keywords internal
+process_historical_enr <- function(df, end_year) {
+
+  if (is.null(df) || nrow(df) == 0) {
+    return(data.frame())
+  }
+
+  cols <- names(df)
+  n_rows <- nrow(df)
+
+  # Helper to find column by pattern (case-insensitive)
+  find_col <- function(patterns) {
+    for (pattern in patterns) {
+      matched <- grep(pattern, cols, value = TRUE, ignore.case = TRUE)
+      if (length(matched) > 0) return(matched[1])
+    }
+    NULL
+  }
+
+  # Build result dataframe
+  result <- data.frame(
+    end_year = rep(end_year, n_rows),
+    type = rep("District", n_rows),
+    stringsAsFactors = FALSE
+  )
+
+  # District ID - historical files use various names
+  # Some early files (1946-47, 1948-49) don't have district IDs
+  dist_id_col <- find_col(c("^DISTRICT_CODE$", "^DISTRICT_NUMBER$", "^DISTRICT_ID$"))
+  if (!is.null(dist_id_col)) {
+    result$district_id <- standardize_district_id(df[[dist_id_col]])
+  } else {
+    result$district_id <- NA_character_
+  }
+
+  # School ID is NA for district rows
+  result$school_id <- rep(NA_character_, n_rows)
+
+  # District name
+  dist_name_col <- find_col(c("^DISTRICT_NAME$", "^DISTRICT$"))
+  if (!is.null(dist_name_col)) {
+    result$district_name <- clean_district_name(df[[dist_name_col]])
+  } else {
+    result$district_name <- NA_character_
+  }
+
+  result$school_name <- rep(NA_character_, n_rows)
+
+  # Total enrollment - historical files use "Total", "Total K-12", or "Grand Total"
+  total_col <- find_col(c("^GRAND_TOTAL$", "^TOTAL_K_12$", "^TOTAL$"))
+  if (!is.null(total_col)) {
+    result$row_total <- safe_numeric(df[[total_col]])
+  } else {
+    result$row_total <- NA_integer_
+  }
+
+  # No demographics in historical data - set all to NA
+  result$white <- NA_integer_
+  result$black <- NA_integer_
+  result$hispanic <- NA_integer_
+  result$asian <- NA_integer_
+  result$native_american <- NA_integer_
+  result$pacific_islander <- NA_integer_
+  result$multiracial <- NA_integer_
+  result$male <- NA_integer_
+  result$female <- NA_integer_
+
+  # Grade levels - historical files use different column naming
+  # 1946-49: KG, 1, 2, 3, ... 12
+  # 1950-69: KG, 1, 2, 3, ... 12
+  # 1972-91: Kindergarten, Grade 1, Grade 2, ... Grade 12
+
+  # No PK in historical data
+  result$grade_pk <- NA_integer_
+
+  # Kindergarten
+  k_col <- find_col(c("^KG$", "^KINDERGARTEN$", "^K$"))
+  if (!is.null(k_col)) {
+    result$grade_k <- safe_numeric(df[[k_col]])
+  } else {
+    result$grade_k <- NA_integer_
+  }
+
+  # Historical grade columns can be "1", "2", ... or "GRADE_1", "GRADE_2", etc.
+  # After standardization, numeric columns become "X1", "X2", etc.
+  grade_map_hist <- list(
+    grade_01 = c("^GRADE_1$", "^1$", "^X1$"),
+    grade_02 = c("^GRADE_2$", "^2$", "^X2$"),
+    grade_03 = c("^GRADE_3$", "^3$", "^X3$"),
+    grade_04 = c("^GRADE_4$", "^4$", "^X4$"),
+    grade_05 = c("^GRADE_5$", "^5$", "^X5$"),
+    grade_06 = c("^GRADE_6$", "^6$", "^X6$"),
+    grade_07 = c("^GRADE_7$", "^7$", "^X7$"),
+    grade_08 = c("^GRADE_8$", "^8$", "^X8$"),
+    grade_09 = c("^GRADE_9$", "^9$", "^X9$"),
+    grade_10 = c("^GRADE_10$", "^10$", "^X10$"),
+    grade_11 = c("^GRADE_11$", "^11$", "^X11$"),
+    grade_12 = c("^GRADE_12$", "^12$", "^X12$")
+  )
+
+  for (name in names(grade_map_hist)) {
+    col <- find_col(grade_map_hist[[name]])
     if (!is.null(col)) {
       result[[name]] <- safe_numeric(df[[col]])
     } else {

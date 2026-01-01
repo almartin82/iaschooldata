@@ -2,19 +2,7 @@
 # Utility Functions
 # ==============================================================================
 
-#' Pipe operator
-#'
-#' See \code{dplyr::\link[dplyr:reexports]{\%>\%}} for details.
-#'
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
-#' @export
-#' @importFrom dplyr %>%
-#' @usage lhs \%>\% rhs
-#' @param lhs A value or the magrittr placeholder.
-#' @param rhs A function call using the magrittr semantics.
-#' @return The result of calling `rhs(lhs)`.
+#' @importFrom rlang .data
 NULL
 
 
@@ -51,12 +39,15 @@ safe_numeric <- function(x) {
 
 #' Get the minimum available year
 #'
-#' Iowa has enrollment data by grade, race, ethnicity, and gender from 1991-92.
+#' Iowa has enrollment data from 1946-47, though not all years have data:
+#' - 1946-47, 1948-49 (no 1947-48)
+#' - 1950-51 to 1969-70 (missing 1951-52, 1953-54)
+#' - 1972-73 to present (missing 1970-71, 1971-72)
 #'
 #' @return Integer representing earliest available year
 #' @keywords internal
 get_min_year <- function() {
-  1992L
+  1947L
 }
 
 
@@ -71,15 +62,36 @@ get_max_year <- function() {
 
 #' Get available years for Iowa enrollment data
 #'
-#' Returns the range of years for which enrollment data is available.
-#' Iowa has data from 1991-92 (end_year = 1992) through 2024-25 (end_year = 2025).
+#' Returns the years for which enrollment data is available.
+#' Iowa has historical data from 1946-47 and modern data through 2024-25.
 #'
+#' Note: Not all years have data available. Missing years include:
+#' - 1948 (1947-48)
+#' - 1950 (1949-50)
+#' - 1952 (1951-52)
+#' - 1954 (1953-54)
+#' - 1971 (1970-71)
+#' - 1972 (1971-72)
+#'
+#' @param include_missing If FALSE (default), returns only years with data.
+#'   If TRUE, returns full range from min to max year.
 #' @return Integer vector of available years
 #' @export
 #' @examples
 #' get_available_years()
-get_available_years <- function() {
-  get_min_year():get_max_year()
+#' get_available_years(include_missing = TRUE)
+get_available_years <- function(include_missing = FALSE) {
+  if (include_missing) {
+    get_min_year():get_max_year()
+  } else {
+    # Years with actual data
+    historical_years <- c(
+      1947, 1949,  # 1946-47, 1948-49
+      1951, 1953, 1955:1970,  # 1950-51 to 1969-70 (gaps in 1952, 1954)
+      1973:get_max_year()  # 1972-73 to present (gap in 1971-72)
+    )
+    historical_years
+  }
 }
 
 
@@ -101,6 +113,16 @@ validate_year <- function(end_year) {
       "end_year must be between ", min_year, " and ", max_year, ".\n",
       "You provided: ", end_year, "\n",
       "Available years: ", min_year, "-", max_year
+    ))
+  }
+
+  # Check if this year has data available
+  available <- get_available_years(include_missing = FALSE)
+  if (!(end_year %in% available)) {
+    stop(paste0(
+      "No data available for year ", end_year, ".\n",
+      "This year is in a gap in the historical data.\n",
+      "Missing years: 1948, 1950, 1952, 1954, 1971, 1972"
     ))
   }
 

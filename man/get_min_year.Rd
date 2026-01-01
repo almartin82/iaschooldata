@@ -10,6 +10,11 @@ get_min_year()
 Integer representing earliest available year
 }
 \description{
-Iowa has enrollment data by grade, race, ethnicity, and gender from 1991-92.
+Iowa has enrollment data from 1946-47, though not all years have data:
+\itemize{
+\item 1946-47, 1948-49 (no 1947-48)
+\item 1950-51 to 1969-70 (missing 1951-52, 1953-54)
+\item 1972-73 to present (missing 1970-71, 1971-72)
+}
 }
 \keyword{internal}

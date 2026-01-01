@@ -33,5 +33,5 @@ Suggests:
     scales
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-URL: https://github.com/almartin82/iaschooldata
+URL: https://almartin82.github.io/iaschooldata, https://github.com/almartin82/iaschooldata
 BugReports: https://github.com/almartin82/iaschooldata/issues

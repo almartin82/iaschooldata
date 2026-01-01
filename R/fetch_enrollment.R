@@ -13,7 +13,11 @@
 #' Education's Education Statistics page.
 #'
 #' @param end_year A school year. Year is the end of the academic year - eg 2023-24
-#'   school year is year '2024'. Valid values are 1992-2025.
+#'   school year is year '2024'. Valid values are 1947-2025, though some years
+#'   are missing (1948, 1950, 1952, 1954, 1971, 1972).
+#'
+#'   Note: Historical data (1947-1991) contains only grade-level enrollment.
+#'   Modern data (1992+) includes demographics and gender breakdowns.
 #' @param tidy If TRUE (default), returns data in long (tidy) format with subgroup
 #'   column. If FALSE, returns wide format.
 #' @param use_cache If TRUE (default), uses locally cached data when available.
@@ -27,6 +31,9 @@
 #' # Get 2024 enrollment data (2023-24 school year)
 #' enr_2024 <- fetch_enr(2024)
 #'
+#' # Get historical data (1969-70 school year)
+#' enr_1970 <- fetch_enr(1970)
+#'
 #' # Get wide format
 #' enr_wide <- fetch_enr(2024, tidy = FALSE)
 #'
@@ -34,7 +41,7 @@
 #' enr_fresh <- fetch_enr(2024, use_cache = FALSE)
 #'
 #' # Filter to specific district
-#' des_moines <- enr_2024 %>%
+#' des_moines <- enr_2024 |>
 #'   dplyr::filter(district_id == "1350")
 #' }
 fetch_enr <- function(end_year, tidy = TRUE, use_cache = TRUE) {
@@ -59,7 +66,7 @@ fetch_enr <- function(end_year, tidy = TRUE, use_cache = TRUE) {
 
   # Optionally tidy
   if (tidy) {
-    processed <- tidy_enr(processed) %>%
+    processed <- tidy_enr(processed) |>
       id_enr_aggs()
   }
 
@@ -87,8 +94,8 @@ fetch_enr <- function(end_year, tidy = TRUE, use_cache = TRUE) {
 #' enr_multi <- fetch_enr_multi(2022:2024)
 #'
 #' # Track enrollment trends
-#' enr_multi %>%
-#'   dplyr::filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
+#' enr_multi |>
+#'   dplyr::filter(is_state, subgroup == "total_enrollment", grade_level == "TOTAL") |>
 #'   dplyr::select(end_year, n_students)
 #' }
 fetch_enr_multi <- function(end_years, tidy = TRUE, use_cache = TRUE) {

@@ -8,7 +8,11 @@ fetch_enr(end_year, tidy = TRUE, use_cache = TRUE)
 }
 \arguments{
 \item{end_year}{A school year. Year is the end of the academic year - eg 2023-24
-school year is year '2024'. Valid values are 1992-2025.}
+school year is year '2024'. Valid values are 1947-2025, though some years
+are missing (1948, 1950, 1952, 1954, 1971, 1972).
+
+Note: Historical data (1947-1991) contains only grade-level enrollment.
+Modern data (1992+) includes demographics and gender breakdowns.}
 
 \item{tidy}{If TRUE (default), returns data in long (tidy) format with subgroup
 column. If FALSE, returns wide format.}
@@ -29,6 +33,9 @@ Education's Education Statistics page.
 \dontrun{
 # Get 2024 enrollment data (2023-24 school year)
 enr_2024 <- fetch_enr(2024)
+
+# Get historical data (1969-70 school year)
+enr_1970 <- fetch_enr(1970)
 
 # Get wide format
 enr_wide <- fetch_enr(2024, tidy = FALSE)
