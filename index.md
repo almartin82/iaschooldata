@@ -5,7 +5,7 @@
 Started](https://almartin82.github.io/iaschooldata/articles/quickstart.html)**
 
 Fetch and analyze Iowa public school enrollment data from the Iowa
-Department of Education.
+Department of Education in R or Python.
 
 ## What can you find with iaschooldata?
 
@@ -197,6 +197,8 @@ remotes::install_github("almartin82/iaschooldata")
 
 ## Quick start
 
+### R
+
 ``` r
 library(iaschooldata)
 library(dplyr)
@@ -225,6 +227,32 @@ enr_2025 %>%
          subgroup %in% c("white", "black", "hispanic", "asian")) %>%
   group_by(district_name, subgroup) %>%
   summarize(n = sum(n_students, na.rm = TRUE))
+```
+
+### Python
+
+``` python
+import pyiaschooldata as ia
+
+# Check available years
+years = ia.get_available_years()
+print(f"Data available from {years['min_year']} to {years['max_year']}")
+
+# Fetch one year
+df = ia.fetch_enr(2025)
+
+# Fetch multiple years
+df_multi = ia.fetch_enr_multi([2020, 2021, 2022, 2023, 2024, 2025])
+
+# State totals
+state_total = df[(df['is_state'] == True) &
+                 (df['subgroup'] == 'total_enrollment') &
+                 (df['grade_level'] == 'TOTAL')]
+
+# District breakdown
+districts = df[(df['is_district'] == True) &
+               (df['subgroup'] == 'total_enrollment') &
+               (df['grade_level'] == 'TOTAL')].sort_values('n_students', ascending=False)
 ```
 
 ## Data availability
