@@ -56,14 +56,14 @@ get_min_year <- function() {
 #' @return Integer representing most recent available year
 #' @keywords internal
 get_max_year <- function() {
-  2024L
+  2025L
 }
 
 
 #' Get available years for Iowa enrollment data
 #'
 #' Returns the years for which enrollment data is available.
-#' Iowa has historical data from 1946-47 and modern data through 2023-24.
+#' Iowa has historical data from 1946-47 and modern data through 2024-25.
 #'
 #' Note: Not all years have data available. Missing years include:
 #' - 1948 (1947-48)
