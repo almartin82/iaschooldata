@@ -15,7 +15,7 @@ Integer vector of available years
 }
 \description{
 Returns the years for which enrollment data is available.
-Iowa has historical data from 1946-47 and modern data through 2023-24.
+Iowa has historical data from 1946-47 and modern data through 2024-25.
 }
 \details{
 Note: Not all years have data available. Missing years include:
