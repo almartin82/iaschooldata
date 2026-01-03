@@ -30,10 +30,6 @@ enr %>%
   select(end_year, n_students)
 ```
 
-![30-year enrollment](reference/figures/enrollment-30yr.png)
-
-30-year enrollment
-
 ------------------------------------------------------------------------
 
 ### 2. Des Moines is the only large district
@@ -64,10 +60,6 @@ enr %>%
   filter(is_state, grade_level == "TOTAL", subgroup == "hispanic") %>%
   select(end_year, n_students, pct)
 ```
-
-![Hispanic growth](reference/figures/hispanic-growth.png)
-
-Hispanic growth
 
 Storm Lake Community School District is now over 70% Hispanic.
 
@@ -131,10 +123,6 @@ enr %>%
   select(end_year, n_students)
 ```
 
-![Kindergarten trend](reference/figures/kindergarten.png)
-
-Kindergarten trend
-
 ------------------------------------------------------------------------
 
 ### 8. English Learners have tripled
@@ -165,10 +153,6 @@ enr %>%
   select(end_year, district_name, n_students) %>%
   tidyr::pivot_wider(names_from = district_name, values_from = n_students)
 ```
-
-![Urban vs rural](reference/figures/urban-rural.png)
-
-Urban vs rural
 
 ------------------------------------------------------------------------
 
