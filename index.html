@@ -32,6 +32,12 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/enrollment-trends.html">Iowa Enrollment Trends</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -50,154 +56,41 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><strong><a href="https://almartin82.github.io/iaschooldata/">Documentation</a></strong> | <strong><a href="https://almartin82.github.io/iaschooldata/articles/quickstart.html">Getting Started</a></strong></p>
+<p><strong><a href="https://almartin82.github.io/iaschooldata/">Documentation</a></strong> | <strong><a href="https://almartin82.github.io/iaschooldata/articles/quickstart.html">Getting Started</a></strong> | <strong><a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html">Enrollment Trends</a></strong></p>
 <p>Fetch and analyze Iowa public school enrollment data from the Iowa Department of Education in R or Python.</p>
 <div class="section level2">
 <h2 id="what-can-you-find-with-iaschooldata">What can you find with iaschooldata?<a class="anchor" aria-label="anchor" href="#what-can-you-find-with-iaschooldata"></a>
 </h2>
 <p><strong>34 years of enrollment data (1992-2025).</strong> 515,000 students today. Over 320 districts. Here are ten stories hiding in the numbers:</p>
+<ol style="list-style-type: decimal">
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#iowas-enrollment-is-remarkably-stable">Iowa’s enrollment is remarkably stable</a> - Steady at ~500,000 for three decades</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#des-moines-is-the-only-large-district">Des Moines is the only large district</a> - 33,000 students, 10x the next largest</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#the-hispanic-transformation-of-iowa">The Hispanic transformation of Iowa</a> - From 2% to 13% since 1992</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#covid-barely-dented-iowa-enrollment">COVID barely dented Iowa enrollment</a> - One of the smallest drops in the nation</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#rural-consolidation-never-stops">Rural consolidation never stops</a> - From 400+ to ~320 districts</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#districts-have-fewer-than-300-students">56 districts have fewer than 300 students</a> - Small-town economics are brutal</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#kindergarten-is-holding-steady">Kindergarten is holding steady</a> - Unlike many states</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#english-learners-have-tripled">English Learners have tripled</a> - Rural schools now need ESL teachers</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#the-urban-rural-divide-grows">The urban-rural divide grows</a> - Two Iowas are emerging</li>
+<li>
+<a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html#iowa-remains-80-white">Iowa remains 80% white</a> - Despite demographic shifts</li>
+</ol>
+<p>See the <a href="https://almartin82.github.io/iaschooldata/articles/enrollment-trends.html">Enrollment Trends vignette</a> for interactive visualizations and code examples.</p>
 <hr>
-<div class="section level3">
-<h3 id="id_1-iowas-enrollment-is-remarkably-stable">1. Iowa’s enrollment is remarkably stable<a class="anchor" aria-label="anchor" href="#id_1-iowas-enrollment-is-remarkably-stable"></a>
-</h3>
-<p>While neighboring states lose students, Iowa has held steady at around 500,000 students for three decades. No boom, no bust.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://almartin82.github.io/iaschooldata">iaschooldata</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">enr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1995</span>, <span class="fl">2000</span>, <span class="fl">2005</span>, <span class="fl">2010</span>, <span class="fl">2015</span>, <span class="fl">2020</span>, <span class="fl">2025</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">enr</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">n_students</span><span class="op">)</span></span></code></pre></div>
-<div class="float">
-<img src="reference/figures/enrollment-30yr.png" alt="30-year enrollment"><div class="figcaption">30-year enrollment</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_2-des-moines-is-the-only-large-district">2. Des Moines is the only large district<a class="anchor" aria-label="anchor" href="#id_2-des-moines-is-the-only-large-district"></a>
-</h3>
-<p>Des Moines Public Schools serves 33,000 students, nearly 10x larger than the next biggest district. Iowa education is fundamentally rural.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">enr_2025</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_enr.html">fetch_enr</a></span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">enr_2025</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_3-the-hispanic-transformation-of-iowa">3. The Hispanic transformation of Iowa<a class="anchor" aria-label="anchor" href="#id_3-the-hispanic-transformation-of-iowa"></a>
-</h3>
-<p>Hispanic students went from 2% to 13% of enrollment since 1992. Meatpacking towns like Storm Lake, Denison, and Marshalltown are now majority Hispanic.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">enr</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"hispanic"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">n_students</span>, <span class="va">pct</span><span class="op">)</span></span></code></pre></div>
-<div class="float">
-<img src="reference/figures/hispanic-growth.png" alt="Hispanic growth"><div class="figcaption">Hispanic growth</div>
-</div>
-<p>Storm Lake Community School District is now over 70% Hispanic.</p>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_4-covid-barely-dented-iowa-enrollment">4. COVID barely dented Iowa enrollment<a class="anchor" aria-label="anchor" href="#id_4-covid-barely-dented-iowa-enrollment"></a>
-</h3>
-<p>Iowa lost only 8,000 students during COVID, one of the smallest drops in the nation. The state’s rural character may have helped.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">enr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fl">2019</span><span class="op">:</span><span class="fl">2025</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">enr</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">n_students</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>change <span class="op">=</span> <span class="va">n_students</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_5-rural-consolidation-never-stops">5. Rural consolidation never stops<a class="anchor" aria-label="anchor" href="#id_5-rural-consolidation-never-stops"></a>
-</h3>
-<p>Iowa had over 400 districts in 1992. Today it has around 320. Every year, more rural districts merge as enrollment shrinks.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1995</span>, <span class="fl">2005</span>, <span class="fl">2015</span>, <span class="fl">2025</span><span class="op">)</span>, <span class="va">fetch_enr</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_districts <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_6-56-districts-have-fewer-than-300-students">6. 56 districts have fewer than 300 students<a class="anchor" aria-label="anchor" href="#id_6-56-districts-have-fewer-than-300-students"></a>
-</h3>
-<p>Iowa’s smallest districts serve just a few hundred students. Ringgold County has fewer than 200. The economics of small-town education are brutal.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">enr_2025</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">&lt;</span> <span class="fl">300</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_7-kindergarten-is-holding-steady">7. Kindergarten is holding steady<a class="anchor" aria-label="anchor" href="#id_7-kindergarten-is-holding-steady"></a>
-</h3>
-<p>Unlike many states where kindergarten enrollment is plummeting, Iowa’s kindergarten numbers remain stable. Birth rates have not collapsed.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">enr</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">n_students</span><span class="op">)</span></span></code></pre></div>
-<div class="float">
-<img src="reference/figures/kindergarten.png" alt="Kindergarten trend"><div class="figcaption">Kindergarten trend</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_8-english-learners-have-tripled">8. English Learners have tripled<a class="anchor" aria-label="anchor" href="#id_8-english-learners-have-tripled"></a>
-</h3>
-<p>Iowa’s ELL population grew from 10,000 to 35,000 students since 2000. Schools in rural communities now need ESL teachers.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fl">2000</span><span class="op">:</span><span class="fl">2025</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"lep"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">n_students</span>, <span class="va">pct</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_9-the-urban-rural-divide-grows">9. The urban-rural divide grows<a class="anchor" aria-label="anchor" href="#id_9-the-urban-rural-divide-grows"></a>
-</h3>
-<p>Waukee, Ankeny, and West Des Moines suburbs are growing. Rural districts lose a dozen students each year. Two Iowas are emerging.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">suburbs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Waukee Community School District"</span>, <span class="st">"Ankeny Community School District"</span>,</span>
-<span>             <span class="st">"West Des Moines Community School District"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">enr</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">district_name</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">suburbs</span>, <span class="va">is_district</span>,</span>
-<span>         <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">district_name</span>, values_from <span class="op">=</span> <span class="va">n_students</span><span class="op">)</span></span></code></pre></div>
-<div class="float">
-<img src="reference/figures/urban-rural.png" alt="Urban vs rural"><div class="figcaption">Urban vs rural</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_10-iowa-remains-80-white">10. Iowa remains 80% white<a class="anchor" aria-label="anchor" href="#id_10-iowa-remains-80-white"></a>
-</h3>
-<p>Despite demographic shifts, Iowa public schools are still predominantly white. Black students are concentrated in Des Moines, Davenport, and Waterloo.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">enr_2025</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span>, <span class="st">"hispanic"</span>, <span class="st">"asian"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">subgroup</span>, <span class="va">n_students</span>, <span class="va">pct</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">pct</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"almartin82/iaschooldata"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -207,7 +100,7 @@
 <div class="section level3">
 <h3 id="r">R<a class="anchor" aria-label="anchor" href="#r"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://almartin82.github.io/iaschooldata">iaschooldata</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
@@ -221,45 +114,45 @@
 <span><span class="va">enr_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fl">1992</span><span class="op">:</span><span class="fl">2025</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># State totals</span></span>
-<span><span class="va">enr_2025</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">enr_2025</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_state</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># District breakdown</span></span>
-<span><span class="va">enr_2025</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">enr_2025</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Demographics by district</span></span>
-<span><span class="va">enr_2025</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">enr_2025</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span>, <span class="st">"hispanic"</span>, <span class="st">"asian"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">subgroup</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span>, <span class="st">"hispanic"</span>, <span class="st">"asian"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">subgroup</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="python">Python<a class="anchor" aria-label="anchor" href="#python"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="im">import</span> pyiaschooldata <span class="im">as</span> ia</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co"># Check available years</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>years <span class="op">=</span> ia.get_available_years()</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data available from </span><span class="sc">{</span>years[<span class="st">'min_year'</span>]<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>years[<span class="st">'max_year'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co"># Fetch one year</span></span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>df <span class="op">=</span> ia.fetch_enr(<span class="dv">2025</span>)</span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co"># Fetch multiple years</span></span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>df_multi <span class="op">=</span> ia.fetch_enr_multi([<span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2022</span>, <span class="dv">2023</span>, <span class="dv">2024</span>, <span class="dv">2025</span>])</span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co"># State totals</span></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>state_total <span class="op">=</span> df[(df[<span class="st">'is_state'</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span></span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>                 (df[<span class="st">'subgroup'</span>] <span class="op">==</span> <span class="st">'total_enrollment'</span>) <span class="op">&amp;</span></span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>                 (df[<span class="st">'grade_level'</span>] <span class="op">==</span> <span class="st">'TOTAL'</span>)]</span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a></span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co"># District breakdown</span></span>
-<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>districts <span class="op">=</span> df[(df[<span class="st">'is_district'</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span></span>
-<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>               (df[<span class="st">'subgroup'</span>] <span class="op">==</span> <span class="st">'total_enrollment'</span>) <span class="op">&amp;</span></span>
-<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>               (df[<span class="st">'grade_level'</span>] <span class="op">==</span> <span class="st">'TOTAL'</span>)].sort_values(<span class="st">'n_students'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="im">import</span> pyiaschooldata <span class="im">as</span> ia</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># Check available years</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>years <span class="op">=</span> ia.get_available_years()</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data available from </span><span class="sc">{</span>years[<span class="st">'min_year'</span>]<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>years[<span class="st">'max_year'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># Fetch one year</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>df <span class="op">=</span> ia.fetch_enr(<span class="dv">2025</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Fetch multiple years</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>df_multi <span class="op">=</span> ia.fetch_enr_multi([<span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2022</span>, <span class="dv">2023</span>, <span class="dv">2024</span>, <span class="dv">2025</span>])</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co"># State totals</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>state_total <span class="op">=</span> df[(df[<span class="st">'is_state'</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>                 (df[<span class="st">'subgroup'</span>] <span class="op">==</span> <span class="st">'total_enrollment'</span>) <span class="op">&amp;</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>                 (df[<span class="st">'grade_level'</span>] <span class="op">==</span> <span class="st">'TOTAL'</span>)]</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co"># District breakdown</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>districts <span class="op">=</span> df[(df[<span class="st">'is_district'</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>               (df[<span class="st">'subgroup'</span>] <span class="op">==</span> <span class="st">'total_enrollment'</span>) <span class="op">&amp;</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>               (df[<span class="st">'grade_level'</span>] <span class="op">==</span> <span class="st">'TOTAL'</span>)].sort_values(<span class="st">'n_students'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

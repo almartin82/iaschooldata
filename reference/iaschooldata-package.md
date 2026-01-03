@@ -72,6 +72,8 @@ Data is sourced from the Iowa Department of Education:
 
 Useful links:
 
+- <https://almartin82.github.io/iaschooldata>
+
 - <https://github.com/almartin82/iaschooldata>
 
 - Report bugs at <https://github.com/almartin82/iaschooldata/issues>
