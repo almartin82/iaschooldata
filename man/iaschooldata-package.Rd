@@ -61,6 +61,7 @@ Data is sourced from the Iowa Department of Education:
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://almartin82.github.io/iaschooldata}
   \item \url{https://github.com/almartin82/iaschooldata}
   \item Report bugs at \url{https://github.com/almartin82/iaschooldata/issues}
 }
