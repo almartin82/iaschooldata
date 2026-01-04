@@ -118,7 +118,7 @@ get_media_id <- function(end_year, level = "district") {
     "2018" = "4094",
     "2017" = "3390",
     "2016" = "2842",
-    "2015" = "2622",
+    "2015" = "2646",
     "2014" = "2263",
     "2013" = "1546",
     "2012" = "1342",
@@ -267,7 +267,13 @@ download_iowa_excel <- function(end_year, level) {
   media_id <- get_media_id(end_year, level)
   url <- build_download_url(media_id)
 
-  temp_file <- tempfile(fileext = ".xlsx")
+  # First do HEAD request to detect file format from Content-Disposition
+  head_response <- httr::HEAD(url, httr::timeout(30))
+  content_disp <- httr::headers(head_response)[["content-disposition"]]
+
+  # Detect extension from filename in header, default to xlsx
+  file_ext <- if (!is.null(content_disp) && grepl("\\.xls\"", content_disp)) ".xls" else ".xlsx"
+  temp_file <- tempfile(fileext = file_ext)
 
   tryCatch({
     response <- httr::GET(

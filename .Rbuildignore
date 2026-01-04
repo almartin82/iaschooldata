@@ -1,1 +1,3 @@
 ^py.*schooldata$
+^doc$
+^Meta$
