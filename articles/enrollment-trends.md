@@ -33,11 +33,12 @@ if (is.list(years)) {
   min_year <- min(years)
 }
 
-# Fetch data
-key_years <- seq(max(min_year, 1995), max_year, by = 5)
+# Fetch data - use years from 2015 onwards (modern files with consistent format)
+# Earlier years have inconsistent file formats that may fail to parse
+key_years <- seq(2015, max_year, by = 3)
 if (!max_year %in% key_years) key_years <- c(key_years, max_year)
 enr <- fetch_enr_multi(key_years)
-enr_recent <- fetch_enr_multi((max_year - 10):max_year)
+enr_recent <- fetch_enr_multi((max_year - 5):max_year)
 enr_current <- fetch_enr(max_year)
 ```
 
